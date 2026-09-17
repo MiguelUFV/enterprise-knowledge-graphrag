@@ -1,0 +1,31 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Ejecutar tests
+        # Los que necesitan Neo4j se omiten solos si la base no está accesible,
+        # así que la CI cubre la lógica pura sin levantar infraestructura.
+        env:
+          JWT_SECRET_KEY: clave-solo-para-ci-no-usar-en-produccion
+          OPENROUTER_API_KEY: sk-ci-sin-llamadas-reales
+        run: pytest -q

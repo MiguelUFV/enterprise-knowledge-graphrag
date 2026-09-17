@@ -155,7 +155,8 @@ pip install -r requirements-dev.txt
 pytest -q
 ```
 
-Los tests que tocan Neo4j se omiten solos si la base no está accesible.
+Los tests que tocan Neo4j se omiten solos si la base no está accesible, así que la
+integración continua (`.github/workflows/tests.yml`) los cubre sin levantar infraestructura.
 
 Vale la pena mirar dos por lo que documentan:
 

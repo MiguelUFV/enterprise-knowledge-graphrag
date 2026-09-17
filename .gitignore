@@ -1,0 +1,125 @@
+# =====================
+# SECRETOS Y CREDENCIALES
+# =====================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.secret
+
+# =====================
+# ENTORNOS VIRTUALES
+# =====================
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# =====================
+# PYTHON
+# =====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.mypy_cache/
+.pytype/
+.pyre/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.trash_cache/
+.tox/
+.nox/
+.pytest_cache/
+
+# =====================
+# DATOS LOCALES Y BASES DE DATOS
+# =====================
+chroma_db/
+*.db
+*.sqlite
+*.sqlite3
+demo_corpus_backup/
+backup/
+data/
+local_data/
+
+# =====================
+# MODELOS DESCARGADOS Y CACHÉS DE RUNTIME
+# =====================
+models/
+model_cache/
+*.onnx
+
+# =====================
+# LOGS Y ARTEFACTOS GENERADOS
+# =====================
+logs/
+*.log
+*.log.*
+PROJECT_TECHNICAL_DOCUMENTATION*.docx
+informe_*.docx
+*.report.json
+
+# =====================
+# IDES Y SISTEMA OPERATIVO
+# =====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =====================
+# DOCKER
+# =====================
+.docker/
+*.tar
+*.tgz
+
+# =====================
+# OTROS
+# =====================
+.gemini/
+.vault/
+*.local
+# Registro de organizaciones (puede contener nombres de clientes)
+tenants.json
+
+# Capturas de verificación
+.playwright-mcp/
+*.png
+
+# Documentacion antigua en Word, sustituida por README.md
+*.docx
+
+# PDFs de la empresa ficticia usados en pruebas manuales; sample_docs/ basta para la demo
+test_documents/

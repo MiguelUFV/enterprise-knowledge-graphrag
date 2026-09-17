@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Asistente de conocimiento corporativo sobre GraphRAG: responde citando sus fuentes y se abstiene cuando la documentación no cubre la pregunta.">
+  <title>Enterprise Knowledge</title>
+  <link rel="icon" href="/static/logo.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@450;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=10">
+</head>
+<body>
+
+  <header class="rail">
+    <button class="rail-brand" id="btnBrand">
+      <img src="/static/logo.jpg" alt="" class="rail-logo" id="brandLogoImg">
+      <span id="appBrandName">Enterprise Knowledge</span>
+    </button>
+
+    <nav class="rail-nav" aria-label="Secciones">
+      <button class="nav-item" data-view="knowledge" id="navKnowledge">Documentos</button>
+      <button class="nav-item active" data-view="chat" id="navChat">Consultar</button>
+      <button class="nav-item" data-view="graph" id="navGraph">Grafo</button>
+      <button class="nav-item" data-view="metrics" id="navMetrics">Métricas</button>
+    </nav>
+
+    <div class="rail-end">
+      <span class="status" id="systemStatus">En línea</span>
+      <button class="icon-btn" id="btnOpenSettings" aria-label="Cómo funciona">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+
+    <!-- ============================ CONSULTAR ============================ -->
+    <section class="view-panel active" id="viewChat">
+      <div class="chat-scroll" id="chatScrollArea">
+        <div class="chat-inner">
+
+          <div class="opening" id="emptyState">
+            <h1>¿Qué necesitas saber?</h1>
+            <p class="opening-lead">
+              Pregunta en lenguaje natural sobre los documentos que hayas subido. Cada respuesta
+              llega con las fuentes que la sostienen. Si la documentación no contiene la respuesta,
+              el asistente lo dice en lugar de inventarla.
+            </p>
+            <div class="suggestions" id="suggestionList"></div>
+          </div>
+
+          <div class="messages" id="messageList"></div>
+
+          <div class="thinking" id="loadingState" hidden>
+            <span class="thinking-bar"></span>
+            <span>Buscando en documentos y grafo</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="composer-inner">
+          <textarea id="chatInput" rows="1" placeholder="Escribe tu pregunta" aria-label="Tu pregunta"></textarea>
+          <button class="icon-btn" id="btnVoiceInput" aria-label="Dictar la pregunta">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 11v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          </button>
+          <button class="btn-send" id="btnSend">Preguntar</button>
+        </div>
+        <p class="composer-note"><span id="appDisclaimerBrand">Enterprise Knowledge</span> responde solo a partir de los documentos indexados.</p>
+      </div>
+    </section>
+
+    <!-- ============================ DOCUMENTOS ============================ -->
+    <section class="view-panel" id="viewKnowledge">
+      <div class="column">
+        <header class="page-head">
+          <h1>Documentos</h1>
+          <p>Cada archivo se trocea por secciones, se indexa para búsqueda y se convierte en
+          entidades y relaciones dentro del grafo.</p>
+        </header>
+
+        <div class="dropzone" id="uploadDropzone">
+          <p class="dropzone-main">Arrastra tus archivos aquí</p>
+          <button class="btn" id="btnSelectFiles">Seleccionar del equipo</button>
+          <p class="dropzone-note">Acepta PDF, Word, texto plano, Markdown, CSV y JSON.</p>
+          <input type="file" id="docFileInput" multiple accept=".pdf,.docx,.txt,.md,.csv,.json" hidden>
+        </div>
+
+        <section class="block" id="fileQueueSection" hidden>
+          <div class="block-head">
+            <h2>Procesando <span class="count" id="queueCount">0</span></h2>
+            <div class="block-actions">
+              <span class="muted" id="queueStatusSummary"></span>
+              <button class="btn-quiet" id="btnClearQueue">Limpiar</button>
+              <button class="btn" id="btnFinishUpload">Ir a consultar</button>
+            </div>
+          </div>
+          <div id="fileQueueList"></div>
+        </section>
+
+        <section class="block">
+          <div class="block-head">
+            <h2>En la base <span class="count" id="activeDocsCount">0</span></h2>
+            <div class="block-actions">
+              <input type="search" id="filterDocsInput" placeholder="Filtrar" aria-label="Filtrar documentos">
+              <button class="btn-quiet" id="btnRefreshActiveDocs">Actualizar</button>
+              <button class="btn-quiet danger" id="btnDeleteAllActiveDocs">Vaciar</button>
+            </div>
+          </div>
+          <div id="activeDocsList"></div>
+          <div class="block-foot">
+            <button class="btn-quiet" id="btnReloadSamples">Cargar documentos de ejemplo</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============================ GRAFO ============================ -->
+    <section class="view-panel" id="viewGraph">
+      <div class="column wide">
+        <header class="page-head row">
+          <div>
+            <h1>Grafo</h1>
+            <p>Entidades y relaciones extraídas de tus documentos. Arrastra para girar, rueda para acercar.</p>
+          </div>
+          <button class="btn-quiet" id="btnRefreshGraph">Recargar</button>
+        </header>
+        <div class="graph-frame" id="graph3d-container"></div>
+        <div class="legend" id="graphLegend"></div>
+      </div>
+    </section>
+
+    <!-- ============================ MÉTRICAS ============================ -->
+    <section class="view-panel" id="viewMetrics">
+      <div class="column">
+        <header class="page-head">
+          <h1>Métricas</h1>
+          <p>Estado del servicio y del almacenamiento.</p>
+        </header>
+
+        <dl class="readout">
+          <div><dt>Latencia media</dt><dd id="valLatency">—</dd></div>
+          <div><dt>Aciertos de caché</dt><dd id="valCacheHit">—</dd></div>
+          <div><dt>Entidades</dt><dd id="valNodes">—</dd></div>
+          <div><dt>Relaciones</dt><dd id="valRels">—</dd></div>
+        </dl>
+
+        <div id="metrics-panel-mount"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="overlay" id="settingsModal" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="sheet-head">
+        <h2 id="settingsTitle">Cómo funciona</h2>
+        <button class="icon-btn" id="btnCloseSettings" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <p>Al subir un documento pasan tres cosas: se trocea por secciones, se indexa para
+        búsqueda semántica y léxica, y un modelo extrae de él las entidades y relaciones
+        que alimentan el grafo.</p>
+        <p>Al preguntar, un enrutador decide cuánto esfuerzo merece la consulta. Se recuperan
+        pasajes y caminos del grafo, y un reordenador mide cuánto tienen que ver con la pregunta.
+        Esa medida fija el nivel de evidencia que acompaña a la respuesta.</p>
+        <p>Cuando la medida indica que la documentación no cubre la pregunta, el asistente se
+        abstiene. Prefiere no responder antes que inventar.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden><span id="toastMessage"></span></div>
+
+  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/3d-force-graph@1.73.3/dist/3d-force-graph.min.js"></script>
+  <script src="/static/graph3d.js?v=10"></script>
+  <script src="/static/metrics.js?v=10"></script>
+  <script src="/static/app.js?v=10"></script>
+</body>
+</html>

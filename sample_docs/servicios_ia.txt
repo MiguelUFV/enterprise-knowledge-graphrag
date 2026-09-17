@@ -1,0 +1,27 @@
+===================================================================
+CATÁLOGO DE SERVICIOS Y SOLUCIONES DE INTELIGENCIA ARTIFICIAL
+Empresa: NexusAI Solutions
+===================================================================
+
+1. Agente Inteligente Customer360 (Chatbot Híbrido RAG)
+   - Descripción: Sistema de atención al cliente automatizado con memoria conversacional y consulta a base de datos de grafos.
+   - Integraciones: CRM HubSpot, Salesforce, WhatsApp Business API, Slack y Zendesk.
+   - Precio Base: 2.500 USD / mes (incluye 50.000 consultas).
+   - Plazo de Entrega e Implementación: 2 a 3 semanas laborables.
+
+2. Motor GraphRAG Empresarial (Grafo + Vectores)
+   - Descripción: Motor de búsqueda semántica profunda conectando datos no estructurados con grafos de conocimiento Neo4j AuraDB.
+   - Integraciones: PostgreSQL, AWS S3, Google Cloud Storage, Microsoft Teams.
+   - Precio Base: 4.800 USD (licencia única de configuración) + 1.200 USD / mes de mantenimiento.
+   - Plazo de Entrega: 4 semanas.
+
+3. Automatización de Documentos con Vision-LLM
+   - Descripción: Extracción de datos de facturas, contratos PDF e imágenes con modelos multimodal.
+   - Integraciones: SAP ERP, ERPNEXT, Make (Integromat), n8n.
+   - Precio Base: 1.800 USD / mes.
+   - Plazo de Entrega: 10 días hábiles.
+
+4. Auditoría y Guardrails de Seguridad para Modelos LLM
+   - Descripción: Implementación de capas anti-prompt injection, moderación de contenido y prevención de alucinaciones.
+   - Precio Base: 3.000 USD por evaluación completa.
+   - Plazo de Entrega: 5 días hábiles.

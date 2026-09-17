@@ -1,0 +1,22 @@
+===================================================================
+POLÍTICAS OPERATIVAS, GARANTÍAS Y EQUIPO DIRECTIVO
+Empresa: NexusAI Solutions
+===================================================================
+
+1. Tiempos de Soporte y Niveles de Servicio (SLA)
+   - Soporte Estándar: Lunes a Viernes de 08:00 a 18:00 (GMT-5). Tiempo de respuesta garantizado: < 4 horas.
+   - Soporte Crítico Enterprise (24/7): Disponible las 24 horas para incidencias de severidad alta. Tiempo de respuesta: < 15 minutos.
+
+2. Garantías y Acuerdos de Nivel de Servicio
+   - Garantía de Uptime: 99.9% de disponibilidad en la API de GraphRAG y servicios en la nube.
+   - Garantía de Precisión: En caso de alucinaciones críticas comprobadas por error de modelo, se ajustará el prompt y la caché semántica sin costo adicional durante los primeros 90 días.
+
+3. Condiciones de Contratación y Cancelación
+   - Los contratos anuales cuentan con un 15% de descuento sobre la tarifa mensual.
+   - Período de cancelación: Aviso previo de 30 días calendario sin penalización.
+
+4. Miembros del Equipo Principal
+   - Elena Rostova: CEO y Fundadora. Especialista en Estrategia de IA y Transformación Digital.
+   - Carlos Mendoza: Director de Arquitectura de Datos y especialista en Neo4j y Grafos de Conocimiento.
+   - Sofía Alarcón: Lideresa de Ciberseguridad y Guardrails de LLMs.
+   - Mateo Benítez: Ingeniero Senior Full-Stack MLOps.

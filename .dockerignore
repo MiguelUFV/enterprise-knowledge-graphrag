@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+chroma_db/
+test_documents/
+tests/
+*.docx
+.git/
+.pytest_cache/
+.vscode/

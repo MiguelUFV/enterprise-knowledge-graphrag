@@ -1,0 +1,11 @@
+{
+  "default": {
+    "display_name": "Enterprise Knowledge"
+  },
+  "acme": {
+    "display_name": "Acme Industrial S.A."
+  },
+  "delta_logistics": {
+    "display_name": "Delta Logistics GmbH"
+  }
+}

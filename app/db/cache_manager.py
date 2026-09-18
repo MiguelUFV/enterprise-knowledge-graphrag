@@ -48,6 +48,27 @@ class CacheManager:
         )
         logger.info(f"ChromaDB CacheManager inicializado en '{persist_directory}' (Colección: {COLLECTION_NAME})")
 
+    def _abrir_coleccion(self):
+        return self.client.get_or_create_collection(
+            name=COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"}
+        )
+
+    def _con_reintento(self, operacion):
+        """
+        El manejador de la colección se queda obsoleto si alguien la borra y la recrea
+        —otro proceso sobre el mismo directorio, o un vaciado global—. A partir de ese
+        momento TODAS las operaciones de caché fallan, y fallan en silencio: el error se
+        registra, la aplicación sigue respondiendo y nadie se entera de que ha dejado de
+        cachear. Se vuelve a abrir la colección y se reintenta una sola vez.
+        """
+        try:
+            return operacion()
+        except Exception as e:
+            logger.warning(f"Manejador de caché obsoleto ({e}). Reabriendo la colección.")
+            self.collection = self._abrir_coleccion()
+            return operacion()
+
     def get_cached_answer(
         self,
         query: str,
@@ -66,12 +87,12 @@ class CacheManager:
         :return: Diccionario con los datos de la respuesta en caché si supera el umbral, o None si no hay coincidencia.
         """
         try:
-            results = self.collection.query(
+            results = self._con_reintento(lambda: self.collection.query(
                 query_texts=[query],
                 n_results=1,
                 where={"tenant_id": tenant_id},
                 include=["metadatas", "distances", "documents"]
-            )
+            ))
 
             if not results or not results["distances"] or len(results["distances"][0]) == 0:
                 return None
@@ -140,11 +161,11 @@ class CacheManager:
                 "tenant_id": tenant_id
             }
 
-            self.collection.upsert(
+            self._con_reintento(lambda: self.collection.upsert(
                 ids=[doc_id],
                 documents=[query],
                 metadatas=[metadata]
-            )
+            ))
             logger.info(f"Respuesta guardada con éxito en caché semántica (ID: {doc_id})")
             return True
 
@@ -158,17 +179,16 @@ class CacheManager:
         """
         try:
             if tenant_id is not None:
-                ids = self.collection.get(where={"tenant_id": tenant_id}).get("ids", [])
+                ids = self._con_reintento(
+                    lambda: self.collection.get(where={"tenant_id": tenant_id})
+                ).get("ids", [])
                 if ids:
-                    self.collection.delete(ids=ids)
+                    self._con_reintento(lambda: self.collection.delete(ids=ids))
                 logger.info(f"Caché semántica de '{tenant_id}' invalidada ({len(ids)} entradas).")
                 return True
 
             self.client.delete_collection(name=COLLECTION_NAME)
-            self.collection = self.client.get_or_create_collection(
-                name=COLLECTION_NAME,
-                metadata={"hnsw:space": "cosine"}
-            )
+            self.collection = self._abrir_coleccion()
             logger.info(f"Caché semántica ('{COLLECTION_NAME}') invalidada y reinicializada con éxito.")
             return True
         except Exception as e:

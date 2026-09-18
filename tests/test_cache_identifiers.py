@@ -80,3 +80,31 @@ def test_la_cache_sigue_sirviendo_la_misma_pregunta():
     _guardar(pregunta, "280.000 EUR.")
     acierto = cache_manager.get_cached_answer(pregunta, tenant_id=TENANT)
     assert acierto and "280.000" in acierto["text"]
+
+
+# --- Robustez del manejador ---------------------------------------------------
+
+def test_la_cache_se_recupera_si_le_borran_la_coleccion_por_debajo():
+    """
+    Regresión: si alguien borra y recrea la colección —otro proceso sobre el mismo
+    directorio, o un vaciado global—, el manejador que tenía el gestor apuntaba a algo
+    que ya no existe. A partir de ahí todas las operaciones fallaban y fallaban en
+    silencio: el error se registraba, la aplicación seguía respondiendo y dejaba de
+    cachear para siempre sin avisar a nadie.
+    """
+    pregunta = "¿Cuanto vale el contrato ZZTEST-4242?"
+    _guardar(pregunta, "Cuatro millones.")
+
+    # Simula el borrado hecho desde fuera: el manejador guardado queda obsoleto.
+    cache_manager.client.delete_collection(name="semantic_cache")
+    cache_manager.client.get_or_create_collection(
+        name="semantic_cache", metadata={"hnsw:space": "cosine"}
+    )
+
+    assert cache_manager.get_cached_answer(pregunta, tenant_id=TENANT) is None, \
+        "la colección se vació: no debe haber acierto, pero tampoco reventar"
+
+    _guardar(pregunta, "Cuatro millones.")
+    recuperada = cache_manager.get_cached_answer(pregunta, tenant_id=TENANT)
+    assert recuperada is not None, "la caché quedó inservible tras el borrado externo"
+    assert "Cuatro millones" in recuperada["text"]

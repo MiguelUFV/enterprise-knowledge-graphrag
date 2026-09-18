@@ -125,6 +125,19 @@ window.Graph3D = (() => {
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
 
+      if (data.error) {
+        container.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+            height:100%;gap:0.5rem;color:#5c6670;text-align:center;padding:1.5rem;">
+            <div style="color:#8a4b2a;font-weight:600">El grafo no está disponible</div>
+            <div style="font-size:0.875rem;max-width:36ch">${esc(data.error)}</div>
+            <div style="font-size:0.8125rem;max-width:40ch">Las respuestas siguen funcionando con la
+            búsqueda sobre documentos; solo se pierden las preguntas de varios saltos.</div>
+          </div>
+        `;
+        return;
+      }
+
       if (!data.nodes || data.nodes.length === 0) {
         container.innerHTML = `
           <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;

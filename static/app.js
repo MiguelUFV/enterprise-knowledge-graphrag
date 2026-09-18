@@ -17,6 +17,9 @@
     brandName: 'Enterprise Knowledge'   // lo sobrescribe COMPANY_NAME vía /api/app-config
   };
 
+  // Debe coincidir con ALLOWED_DOC_EXTENSIONS en app/main.py
+  const FORMATOS = ['pdf', 'docx', 'txt', 'md', 'csv', 'json'];
+
   const RUTAS = {
     FAST_PATH: 'directa',
     HYBRID_PATH: 'híbrida',
@@ -202,6 +205,14 @@
       const fileId = 'f' + Math.random().toString(36).slice(2, 10);
       state.activeTasks.set(fileId, { file: file, taskId: null });
       addQueueRow(fileId, file);
+
+      // Rechaza aquí lo que el servidor rechazaría igualmente: evita la subida
+      // y da un motivo concreto en vez de un código de estado.
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      if (FORMATOS.indexOf(ext) === -1) {
+        setQueueError(fileId, 'Formato .' + ext + ' no admitido. Se aceptan ' + FORMATOS.join(', ') + '.');
+        return;
+      }
       uploadFile(fileId, file);
     });
     updateQueueSummary();
@@ -229,7 +240,10 @@
 
     try {
       const resp = await fetch('/api/ingest-document', { method: 'POST', body: form });
-      if (!resp.ok) throw new Error('El servidor rechazó el archivo (' + resp.status + ')');
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.detail || 'El servidor rechazó el archivo (' + resp.status + ')');
+      }
 
       const data = await resp.json();
       state.activeTasks.set(fileId, { file: file, taskId: data.task_id });
@@ -531,9 +545,25 @@
       const resp = await fetch('/api/suggested-questions');
       if (!resp.ok) return;
       const items = await resp.json();
-      if (!Array.isArray(items) || !items.length) return;
 
       dom.suggestionList.innerHTML = '';
+
+      // Sin documentos no hay nada que preguntar: cualquier sugerencia terminaría
+      // en una abstención. Se invita a subir el primero.
+      if (!Array.isArray(items) || !items.length) {
+        const aviso = document.createElement('p');
+        aviso.className = 'empty-note';
+        aviso.textContent = 'Todavía no hay documentos indexados. ';
+        const enlace = document.createElement('button');
+        enlace.className = 'link';
+        enlace.textContent = 'Sube el primero';
+        enlace.addEventListener('click', () => switchView('knowledge'));
+        aviso.appendChild(enlace);
+        aviso.appendChild(document.createTextNode(' y podrás preguntar sobre él.'));
+        dom.suggestionList.appendChild(aviso);
+        return;
+      }
+
       items.forEach(item => {
         const btn = document.createElement('button');
         btn.className = 'suggestion';

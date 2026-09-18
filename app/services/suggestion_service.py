@@ -19,32 +19,10 @@ logger = logging.getLogger(__name__)
 # Caché en memoria para evitar llamadas redundantes
 _SUGGESTION_CACHE: Dict[str, List[Dict[str, Any]]] = {}
 
-DEFAULT_ONBOARDING_QUESTIONS = [
-    {
-        "category": "Guía de Inicio",
-        "icon": "🚀",
-        "text": "¿Cómo empezar a usar el asistente?",
-        "query": "¿Cómo funciona el asistente de conocimiento y qué tipo de documentos puedo consultar?"
-    },
-    {
-        "category": "Formatos",
-        "icon": "📄",
-        "text": "¿Qué formatos de archivo puedo subir?",
-        "query": "¿Qué formatos de documentos (PDF, Word, TXT, MD, CSV) son compatibles para la ingesta?"
-    },
-    {
-        "category": "Grafo Relacional",
-        "icon": "🕸️",
-        "text": "¿Cómo se construye el Grafo de Conocimiento?",
-        "query": "¿Cómo extrae el sistema las entidades y relaciones entre documentos para crear el grafo relacional?"
-    },
-    {
-        "category": "Privacidad y Seguridad",
-        "icon": "🛡️",
-        "text": "¿Cómo se protege y almacena la información?",
-        "query": "¿Qué medidas de seguridad, control de acceso RBAC y almacenamiento local implementa esta plataforma?"
-    }
-]
+# Con la base vacía no se sugiere nada: cualquier pregunta se contestaría con una
+# abstención, y la primera impresión del usuario sería un fallo del sistema. La
+# interfaz muestra en su lugar una invitación a subir el primer documento.
+SIN_CORPUS: List[Dict[str, Any]] = []
 
 
 def _fetch_top_entities(tenant_id: str = DEFAULT_TENANT_ID) -> List[str]:
@@ -72,7 +50,7 @@ async def get_adaptive_suggestions(tenant_id: str = DEFAULT_TENANT_ID) -> List[D
     """
     docs_list = await asyncio.to_thread(hybrid_retriever.list_indexed_documents, tenant_id)
     if not docs_list:
-        return DEFAULT_ONBOARDING_QUESTIONS
+        return SIN_CORPUS
 
     doc_names = [d["filename"] for d in docs_list]
 

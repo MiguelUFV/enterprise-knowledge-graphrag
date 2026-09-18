@@ -79,8 +79,12 @@ Navegador  ──►  FastAPI  ──►  Enrutador de consultas
 ### Requisitos
 
 - Python 3.12
-- Una instancia de Neo4j (sirve [Aura](https://neo4j.com/cloud/aura/), capa gratuita)
 - Una clave de [OpenRouter](https://openrouter.ai/)
+- Neo4j, opcional (sirve [Aura](https://neo4j.com/cloud/aura/), capa gratuita)
+
+**Sin Neo4j la aplicación funciona igual**: responde con búsqueda vectorial y léxica sobre
+los documentos, y la vista del grafo avisa de que no está disponible. Solo se pierden las
+preguntas que necesitan recorrer relaciones.
 
 ### Instalación
 
@@ -144,6 +148,10 @@ caso que más fácil se rompe: dos empresas con una entidad que se llama igual.
 - **Guardrail de entrada** en dos fases: un filtro heurístico local instantáneo y una
   verificación con modelo que corre en paralelo a la recuperación. No se genera nada
   hasta que confirma que la consulta es legítima.
+- **Cabeceras de seguridad** en cada respuesta: CSP que restringe de dónde puede cargar
+  la página, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy` y una `Permissions-Policy`
+  que solo concede el micrófono (lo usa el dictado).
+- **La documentación interactiva** (`/docs`, `/openapi.json`) se apaga en producción.
 - **Cypher parametrizado** en todas las consultas, con los tipos de relación saneados.
 - **Aislamiento entre organizaciones** verificado por tests, caché semántica incluida.
 - Un administrador solo puede vaciar los datos de su propia organización.

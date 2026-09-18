@@ -64,7 +64,3 @@ def tenant_display_name(tenant_id: str) -> str:
         return os.getenv("COMPANY_NAME", "Enterprise Knowledge").strip() or "Enterprise Knowledge"
     return tenant_id
 
-
-def known_tenants() -> Dict[str, Dict[str, Any]]:
-    """Organizaciones declaradas en el registro (vacío en despliegues de una sola)."""
-    return dict(_load())

@@ -59,8 +59,13 @@ UNSAFE_QUERY_DETAIL = (
 
 app = FastAPI(
     title="Enterprise Hybrid GraphRAG API",
-    description="API Gateway para el sistema empresarial de Recuperación Aumentada por Generación Híbrida (Vectores + Grafo)",
-    version="3.0.0"
+    description="API del asistente de conocimiento corporativo: recuperación híbrida sobre vectores y grafo.",
+    version="3.0.0",
+    # /docs describe cada endpoint y su esquema: útil desarrollando, innecesario
+    # en producción, donde solo sirve para que un tercero estudie la superficie.
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None,
+    openapi_url=None if IS_PRODUCTION else "/openapi.json",
 )
 
 app.state.limiter = limiter
@@ -83,18 +88,54 @@ static_dir = os.path.join(BASE_DIR, "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
-@app.middleware("http")
-async def revalidate_static_assets(request: Request, call_next):
-    """
-    Obliga al navegador a revalidar la interfaz en cada carga.
+# La interfaz carga three.js desde unpkg y las tipografías desde Google Fonts.
+# Todo lo demás debe venir de este servidor; 'unsafe-inline' en estilos es necesario
+# porque el visor del grafo compone estilos en el propio elemento.
+CONTENT_SECURITY_POLICY = "; ".join([
+    "default-src 'self'",
+    "script-src 'self' https://unpkg.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data:",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+])
 
-    Sin esto, tras desplegar una versión nueva el navegador sigue sirviendo el HTML
-    y el JavaScript viejos de su caché, y la aplicación queda a medias. El ETag hace
-    que la revalidación devuelva 304 y no cueste ancho de banda cuando nada cambió.
+SECURITY_HEADERS = {
+    "Content-Security-Policy": CONTENT_SECURITY_POLICY,
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+    # El dictado por voz necesita el micrófono; nada más.
+    "Permissions-Policy": "microphone=(self), camera=(), geolocation=(), interest-cohort=()",
+}
+
+
+@app.middleware("http")
+async def security_and_cache_headers(request: Request, call_next):
+    """
+    Añade las cabeceras de seguridad y obliga a revalidar la interfaz.
+
+    Sin la revalidación, tras desplegar una versión nueva el navegador sigue sirviendo
+    el HTML y el JavaScript viejos de su caché y la aplicación queda a medias. El ETag
+    hace que la revalidación devuelva 304 y no cueste ancho de banda si nada cambió.
     """
     response = await call_next(request)
+
+    for cabecera, valor in SECURITY_HEADERS.items():
+        response.headers.setdefault(cabecera, valor)
+
+    if IS_PRODUCTION:
+        response.headers.setdefault(
+            "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
+        )
+
     if request.url.path == "/" or request.url.path.startswith("/static/"):
         response.headers["Cache-Control"] = "no-cache"
+
     return response
 
 

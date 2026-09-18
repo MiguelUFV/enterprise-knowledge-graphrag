@@ -86,7 +86,12 @@ async def get_graph_data_for_viz(max_nodes: int = 500, tenant_id: str = DEFAULT_
     raw_rels = raw.get("relationships", [])
 
     if not raw_nodes:
-        return {"nodes": [], "links": [], "node_count": 0, "link_count": 0}
+        # Sin nodos hay dos causas muy distintas y el usuario debe poder distinguirlas:
+        # que todavía no haya subido documentos, o que Neo4j no esté accesible.
+        vacio = {"nodes": [], "links": [], "node_count": 0, "link_count": 0}
+        if raw.get("error"):
+            vacio["error"] = "No se pudo conectar con Neo4j. Revisa NEO4J_URI y las credenciales."
+        return vacio
 
     # Detectar GDS y obtener centralidad si está disponible
     gds_available = await asyncio.to_thread(graph_manager.check_gds_available)

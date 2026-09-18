@@ -204,7 +204,7 @@ pytest -q
 
 Los tests que tocan Neo4j se omiten solos si la base no está accesible, así que la
 integración continua (`.github/workflows/tests.yml`) los cubre sin levantar infraestructura.
-Sobre un clon limpio y sin Neo4j configurado: **168 pasan y 15 se omiten**.
+Sobre un clon limpio y sin Neo4j configurado: **183 pasan y 15 se omiten**.
 
 Vale la pena mirar dos por lo que documentan:
 

@@ -35,7 +35,7 @@ un modelo extrae de él entidades y relaciones que van a un grafo Neo4j.
 1. Un enrutador determinista decide cuánto esfuerzo merece la consulta: ruta directa,
    híbrida o grafo completo. Evita gastar llamadas al modelo en preguntas simples.
 2. Se recuperan pasajes por vector y por BM25, se fusionan con Reciprocal Rank Fusion y
-   un cross-encoder local (ONNX, sin red) los reordena por relevancia real.
+   un cross-encoder local (ONNX) los reordena por relevancia real.
 3. Esa puntuación de relevancia determina el **nivel de evidencia** (A a D) mediante
    umbrales calibrados con medidas reales, sin llamar a ningún modelo.
 4. Solo si hay evidencia se genera la respuesta. Un evaluador la audita después y
@@ -52,6 +52,34 @@ confirma que la consulta es legítima.
 | B | Sostiene parte; falta algún dato pedido | Responde señalando lo que falta |
 | C | Hay material del mismo ámbito, pero el dato concreto puede no estar | Responde avisando de que la evidencia es débil |
 | D | El tema no aparece en la documentación | Se abstiene |
+
+## Qué tan bien funciona
+
+La afirmación de arriba se mide, no se asume. `eval/evaluar.py` lanza 20 preguntas contra
+el corpus de `sample_docs/` y cuenta las dos formas distintas de equivocarse.
+
+| | |
+|---|---|
+| Preguntas que el corpus responde | 12 |
+| · contestadas | 10 |
+| · con el dato correcto | **10 de 10** |
+| Preguntas que el corpus **no** responde | 8 |
+| · se abstuvo | **8 de 8** |
+| · se inventó algo | **0** |
+| Latencia mediana | 7,9 s |
+
+Medido el 18 de septiembre de 2026 con `gpt-4o-mini`. Para reproducirlo: levanta el
+servidor, pulsa **Cargar documentos de ejemplo** y ejecuta `python eval/evaluar.py`.
+
+Las ocho preguntas sin respuesta no son fáciles a propósito. Preguntan por un contrato, un
+incidente y un proyecto que no existen pero **se parecen mucho a los que sí** (`INC-2024-015`
+frente a `INC-2025-047`). Es el caso que rompe a un RAG corriente, y es el que rompía a este
+hasta que se midió: la caché semántica servía la respuesta del código parecido, en 0,3 s y
+etiquetada como evidencia suficiente. Dos preguntas casi idénticas son casi el mismo vector.
+`tests/test_cache_identifiers.py` fija esa regresión.
+
+Veinte preguntas sobre un corpus ficticio no son un benchmark. Sirven para lo que sirven:
+que la afirmación central del proyecto tenga un número detrás y se pueda volver a medir.
 
 ## Arquitectura
 
@@ -105,6 +133,15 @@ uvicorn app.main:app --reload
 Abre `http://127.0.0.1:8000`, sube un documento y pregunta sobre él. El botón
 **Cargar documentos de ejemplo** indexa el corpus ficticio de `sample_docs/` si quieres
 probar sin subir nada propio.
+
+Dos avisos sobre el primer arranque:
+
+- **La primera pregunta tarda más.** El cross-encoder descarga su modelo ONNX (~100 MB) la
+  primera vez; a partir de ahí corre en local sin salir de la máquina. Lo mismo con el
+  modelo de voz, la primera vez que se dicta. Si vas a enseñarlo, haz una pregunta antes.
+- **En Windows, clónalo en una ruta corta** (`C:\proyectos\...`). Una de las dependencias
+  crea rutas muy profundas y la instalación falla con `OSError` si se pasa de 260
+  caracteres y el sistema no tiene activado el soporte de rutas largas.
 
 ### Con Docker
 
@@ -167,6 +204,7 @@ pytest -q
 
 Los tests que tocan Neo4j se omiten solos si la base no está accesible, así que la
 integración continua (`.github/workflows/tests.yml`) los cubre sin levantar infraestructura.
+Sobre un clon limpio y sin Neo4j configurado: **168 pasan y 15 se omiten**.
 
 Vale la pena mirar dos por lo que documentan:
 
@@ -191,8 +229,13 @@ Es un prototipo, y estas cosas están sin resolver a propósito:
   similitud textual no cruza idiomas.
 - **Extracción de entidades sin revisión humana.** Hay filtros que descartan métricas y
   sintagmas genéricos, pero nadie valida el grafo resultante.
-- **Sin control de versiones de documentos.** Volver a subir un archivo lo reindexa; no
-  hay histórico.
+- **Se calla de más.** En la medición, 2 de las 12 preguntas respondibles acabaron en
+  abstención: en una, el dato pedido (SLA del 99,99%) convive con otro casi idéntico
+  (99,9%) y la recuperación trae el equivocado; en la otra, la ruta rápida dio por ausente
+  un dato que sí estaba. Es el fallo barato de los dos, pero es un fallo.
+- **Sin control de versiones de documentos.** Volver a subir un archivo sustituye por
+  completo a la versión anterior —fragmentos, índice léxico y entidades—, pero no queda
+  histórico ni se puede volver atrás.
 
 ## Estructura
 
@@ -204,6 +247,7 @@ app/
   services/    ingesta, métricas, sugerencias, visualización, voz
 static/        interfaz (sin framework ni compilación)
 tests/         unitarios y de integración
+eval/          conjunto de preguntas y script de medición
 sample_docs/   corpus ficticio para probar sin datos propios
 ```
 

@@ -83,7 +83,6 @@ async def get_adaptive_suggestions(tenant_id: str = DEFAULT_TENANT_ID) -> List[D
                 "[\n"
                 "  {\n"
                 "    \"category\": \"Categoría corta (ej. Tecnología / Legal / HR / Proyecto / ...)\",\n"
-                "    \"icon\": \"Emoji representativo (ej. 🚀, ⚖️, 🧑‍💻, 🛡️, 💡)\",\n"
                 "    \"text\": \"Texto breve y conciso para el botón (máx 6 palabras)\",\n"
                 "    \"query\": \"Pregunta completa detallada que se enviará al asistente\"\n"
                 "  }\n"
@@ -114,13 +113,11 @@ async def get_adaptive_suggestions(tenant_id: str = DEFAULT_TENANT_ID) -> List[D
     fallback = [
         {
             "category": "Visión General",
-            "icon": "📑",
             "text": "¿Qué tienen en común los documentos?",
             "query": "¿Qué tienen en común los documentos subidos y cuáles son sus temáticas principales?"
         },
         {
             "category": "Contenido",
-            "icon": "📊",
             "text": f"Resumen de {doc_names[0][:20]}",
             "query": f"¿Cuáles son los puntos clave y conceptos principales explicados en {doc_names[0]}?"
         }
@@ -128,13 +125,11 @@ async def get_adaptive_suggestions(tenant_id: str = DEFAULT_TENANT_ID) -> List[D
     if len(doc_names) > 1:
         fallback.append({
             "category": "Análisis Detallado",
-            "icon": "💡",
             "text": f"Detalles de {doc_names[1][:20]}",
             "query": f"Explica en detalle los conceptos y normativas tratados en {doc_names[1]}."
         })
     fallback.append({
         "category": "Grafo Relacional",
-        "icon": "🕸️",
         "text": "Entidades y relaciones clave",
         "query": "¿Qué entidades, personas o conceptos principales conectan los documentos en el grafo de conocimiento?"
     })

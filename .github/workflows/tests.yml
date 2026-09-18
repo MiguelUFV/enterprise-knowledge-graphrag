@@ -27,5 +27,5 @@ jobs:
         # así que la CI cubre la lógica pura sin levantar infraestructura.
         env:
           JWT_SECRET_KEY: clave-solo-para-ci-no-usar-en-produccion
-          OPENROUTER_API_KEY: sk-ci-sin-llamadas-reales
+          OPENROUTER_API_KEY: clave-falsa-la-ci-no-llama-al-modelo
         run: pytest -q

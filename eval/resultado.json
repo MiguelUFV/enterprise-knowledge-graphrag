@@ -1,0 +1,213 @@
+{
+  "resumen": {
+    "respondibles": 12,
+    "respondidas": 10,
+    "respondidas_con_el_dato_correcto": 10,
+    "fuera_de_corpus": 8,
+    "abstenciones_correctas": 8,
+    "invenciones": 0,
+    "segundos_mediana": 7.9
+  },
+  "detalle": [
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Que penalizacion aplica el contrato CNT-2021-BCP-001 si el uptime baja del 99.9%?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "FAST_PATH",
+      "segundos": 4.3,
+      "respuesta": "Si el uptime baja del 99.9% en un mes, el contrato CNT-2021-BCP-001 establece que NexusAI aplicará un descuento del 10% de la cuota mensual correspondiente a ese mes. Esta información se encuentra en la cláusula de penalización del contrato."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Cual es la penalizacion mensual del contrato con SLA de 99.99% de uptime?",
+      "abstuvo": true,
+      "acerto": false,
+      "nivel": "LEVEL_C_RELATED_INSUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 9.0,
+      "respuesta": "La penalización mensual del contrato con un SLA de 99.9% de uptime, según la cláusula de penalización documentada, es un descuento del 10% de la cuota mensual si el uptime cae por debajo del 99.9% en un mes. \n\nNo consta en la documentación información sobre penalizaciones específicas para un SLA de "
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Que descuento tienen los contratos anuales sobre la tarifa mensual?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 7.9,
+      "respuesta": "Los contratos anuales cuentan con un 15% de descuento sobre la tarifa mensual. Esta información está claramente documentada en la política de contratación de la empresa."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Cual es el tiempo de respuesta garantizado del Soporte Critico Enterprise?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 11.6,
+      "respuesta": "El tiempo de respuesta garantizado del Soporte Crítico Enterprise es de menos de 15 minutos, disponible las 24 horas para incidencias de severidad alta."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Quien es la CISO de NexusAI Solutions?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 9.3,
+      "respuesta": "La CISO de NexusAI Solutions es Sofía Alarcón, quien ocupa el cargo desde 2021."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Quien dirige el laboratorio de investigacion de NexusAI?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 7.1,
+      "respuesta": "El laboratorio de investigación de NexusAI, conocido como NexusAI Research Lab, es dirigido por el Dr. Yuki Tanaka."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Cual es el presupuesto asignado al proyecto NEXUS-RESEARCH-001?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 8.0,
+      "respuesta": "El presupuesto asignado al proyecto NEXUS-RESEARCH-001 es de 280.000 EUR, proveniente de la Serie B."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Cuanto duro el incidente INC-2026-001?",
+      "abstuvo": true,
+      "acerto": false,
+      "nivel": "LEVEL_D_NO_EVIDENCE",
+      "ruta": "FAST_PATH",
+      "segundos": 2.4,
+      "respuesta": "No consta en la documentación la duración del incidente INC-2026-001. La información disponible se centra en los involucrados y el sistema afectado, pero no proporciona detalles sobre el tiempo que duró el incidente."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Que severidad tuvo el incidente INC-2025-047?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "FAST_PATH",
+      "segundos": 6.4,
+      "respuesta": "El incidente INC-2025-047 tuvo una severidad clasificada como ALTA (P2). Este incidente, relacionado con la degradación de performance en Neo4j AuraDB, fue detectado el 23 de octubre de 2025 a las 09:15 UTC y se resolvió el mismo día a las 13:40 UTC, con una duración total de 4 horas y 25 minutos. L"
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Con cuantos dias de preaviso se puede cancelar un contrato sin penalizacion?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 7.9,
+      "respuesta": "Para cancelar un contrato sin penalización, se requiere un aviso previo de 30 días calendario. Esta información está documentada en la sección de \"Condiciones de Contratación y Cancelación\"."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿Que porcentaje de los ingresos recibe NexusAI en el acuerdo con LegalTech Global?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 7.5,
+      "respuesta": "NexusAI recibe el 70% de los ingresos generados por LegalTech Global en el acuerdo de distribución y revenue share. LegalTech Global retiene el 30% como margen de distribución."
+    },
+    {
+      "tipo": "respondible",
+      "pregunta": "¿En que año y en que ciudad se fundo NexusAI Solutions?",
+      "abstuvo": false,
+      "acerto": true,
+      "nivel": "LEVEL_A_SUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 7.4,
+      "respuesta": "NexusAI Solutions S.L. fue fundada en el año 2019 en Madrid, España."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Cual es el presupuesto del proyecto NEXUS-RESEARCH-009?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_C_RELATED_INSUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 7.8,
+      "respuesta": "No consta en la documentación información sobre el presupuesto del proyecto NEXUS-RESEARCH-009. El presupuesto está indicado como \"por determinar\" en el contexto de otros proyectos, pero no se proporciona información específica para NEXUS-RESEARCH-009."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Cuantos empleados tiene la oficina de NexusAI en Tokio?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_C_RELATED_INSUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 14.4,
+      "respuesta": "No consta en la documentación cuántos empleados tiene la oficina de NexusAI en Tokio."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Cuanto costo la adquisicion de DataFlux por parte de NexusAI?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_C_RELATED_INSUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 16.3,
+      "respuesta": "No consta en la documentación el costo de la adquisición de DataFlux por parte de NexusAI."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Que resultado obtuvo NexusAI en la auditoria de la norma ISO 9001?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_C_RELATED_INSUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 13.4,
+      "respuesta": "No consta en la documentación información sobre el resultado de la auditoría de la norma ISO 9001 para NexusAI."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Que penalizacion establece el contrato CNT-2019-ABC-777?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_D_NO_EVIDENCE",
+      "ruta": "HYBRID_PATH",
+      "segundos": 4.8,
+      "respuesta": "No consta en la documentación información específica sobre la penalización establecida en el contrato CNT-2019-ABC-777."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Como se resolvio el incidente INC-2024-015?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_D_NO_EVIDENCE",
+      "ruta": "HYBRID_PATH",
+      "segundos": 6.5,
+      "respuesta": "No consta en la documentación información sobre el incidente INC-2024-015. La evidencia disponible se refiere únicamente al incidente INC-2026-001, que fue resuelto el 15 de enero de 2026."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Cuantas patentes tiene registradas NexusAI?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_C_RELATED_INSUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 14.1,
+      "respuesta": "No consta en la documentación cuántas patentes tiene registradas NexusAI."
+    },
+    {
+      "tipo": "fuera_de_corpus",
+      "pregunta": "¿Que empresa presta el servicio de limpieza de las oficinas de NexusAI?",
+      "abstuvo": true,
+      "acerto": true,
+      "nivel": "LEVEL_C_RELATED_INSUFFICIENT",
+      "ruta": "HYBRID_PATH",
+      "segundos": 9.1,
+      "respuesta": "No consta en la documentación información sobre la empresa que presta el servicio de limpieza de las oficinas de NexusAI."
+    }
+  ]
+}

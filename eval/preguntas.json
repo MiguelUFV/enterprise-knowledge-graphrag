@@ -1,0 +1,28 @@
+{
+  "corpus": "sample_docs/",
+  "nota": "12 preguntas que el corpus responde y 8 que no. Las segundas son del mismo dominio y suenan plausibles a proposito: distinguirlas es el problema dificil, no descartar una pregunta sobre el tiempo.",
+  "respondibles": [
+    {"pregunta": "¿Que penalizacion aplica el contrato CNT-2021-BCP-001 si el uptime baja del 99.9%?", "debe_contener": ["10"]},
+    {"pregunta": "¿Cual es la penalizacion mensual del contrato con SLA de 99.99% de uptime?", "debe_contener": ["25"]},
+    {"pregunta": "¿Que descuento tienen los contratos anuales sobre la tarifa mensual?", "debe_contener": ["15"]},
+    {"pregunta": "¿Cual es el tiempo de respuesta garantizado del Soporte Critico Enterprise?", "debe_contener": ["15"]},
+    {"pregunta": "¿Quien es la CISO de NexusAI Solutions?", "debe_contener": ["Alarc"]},
+    {"pregunta": "¿Quien dirige el laboratorio de investigacion de NexusAI?", "debe_contener": ["Tanaka"]},
+    {"pregunta": "¿Cual es el presupuesto asignado al proyecto NEXUS-RESEARCH-001?", "debe_contener": ["280"]},
+    {"pregunta": "¿Cuanto duro el incidente INC-2026-001?", "debe_contener": ["33"]},
+    {"pregunta": "¿Que severidad tuvo el incidente INC-2025-047?", "debe_contener": ["ALTA", "P2", "alta"]},
+    {"pregunta": "¿Con cuantos dias de preaviso se puede cancelar un contrato sin penalizacion?", "debe_contener": ["30"]},
+    {"pregunta": "¿Que porcentaje de los ingresos recibe NexusAI en el acuerdo con LegalTech Global?", "debe_contener": ["70"]},
+    {"pregunta": "¿En que año y en que ciudad se fundo NexusAI Solutions?", "debe_contener": ["2019"]}
+  ],
+  "fuera_de_corpus": [
+    {"pregunta": "¿Cual es el presupuesto del proyecto NEXUS-RESEARCH-009?"},
+    {"pregunta": "¿Cuantos empleados tiene la oficina de NexusAI en Tokio?"},
+    {"pregunta": "¿Cuanto costo la adquisicion de DataFlux por parte de NexusAI?"},
+    {"pregunta": "¿Que resultado obtuvo NexusAI en la auditoria de la norma ISO 9001?"},
+    {"pregunta": "¿Que penalizacion establece el contrato CNT-2019-ABC-777?"},
+    {"pregunta": "¿Como se resolvio el incidente INC-2024-015?"},
+    {"pregunta": "¿Cuantas patentes tiene registradas NexusAI?"},
+    {"pregunta": "¿Que empresa presta el servicio de limpieza de las oficinas de NexusAI?"}
+  ]
+}

@@ -60,3 +60,18 @@ def test_extractor_rechaza_archivo_vacio():
         assert False, "debe lanzar ValueError"
     except ValueError:
         pass
+
+
+def test_una_seccion_corta_pero_unica_no_se_pierde():
+    """
+    Regresión: el mínimo por caracteres borraba secciones de una frase. El dato quedaba
+    sin respuesta posible aunque el documento estuviera subido y contase como indexado.
+    """
+    doc = "# Preaviso\n\nEl plazo de preaviso es de 15 dias naturales.\n"
+    chunks = chunker.chunk_document(doc, "convenio.md")
+    assert any("15 dias naturales" in c.text for c in chunks)
+
+
+def test_un_documento_corto_entero_se_indexa():
+    doc = "La tarifa de mantenimiento asciende a 12400 euros anuales."
+    assert chunker.chunk_document(doc, "tarifa.txt"), "58 caracteres, pero es todo el documento"

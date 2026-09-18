@@ -50,11 +50,13 @@ class StructuredChunker:
         self,
         target_chunk_size: int = 800,
         chunk_overlap: int = 150,
-        min_chunk_size: int = 60
+        min_chunk_size: int = 60,
+        min_chunk_words: int = 5
     ):
         self.target_chunk_size = target_chunk_size
         self.chunk_overlap = chunk_overlap
         self.min_chunk_size = min_chunk_size
+        self.min_chunk_words = min_chunk_words
 
     def _is_table_row(self, line: str) -> bool:
         stripped = line.strip()
@@ -66,6 +68,23 @@ class StructuredChunker:
         if match:
             return (len(match.group(1)), match.group(2).strip())
         return None
+
+    def _merece_fragmento(self, texto: str, redundante: bool) -> bool:
+        """
+        El mínimo por caracteres existe para descartar ruido (números de página, líneas
+        sueltas), pero aplicado a secciones cortas *únicas* borraba contenido real: una
+        sección de una frase ("El plazo de preaviso es de 15 días") desaparecía del índice
+        y el dato quedaba sin respuesta posible aunque el documento estuviera subido.
+
+        Así que el corte por longitud solo decide sobre texto que ya está duplicado en
+        otro fragmento (las filas de una tabla viven también en el fragmento de la tabla
+        completa). Lo único e irrepetible se conserva si dice algo: varias palabras.
+        """
+        if len(texto) >= self.min_chunk_size:
+            return True
+        if redundante:
+            return False
+        return len(texto.split()) >= self.min_chunk_words
 
     def chunk_document(self, content: str, filename: str) -> List[StructuredChunk]:
         """
@@ -113,7 +132,10 @@ class StructuredChunker:
                                 sections.append({
                                     "header_path": f"{header_path} > Fila {r_idx}" if header_path else f"Tabla > Fila {r_idx}",
                                     "text": row_chunk_text,
-                                    "is_atomic": True
+                                    "is_atomic": True,
+                                    # La fila ya esta dentro del fragmento de la tabla completa:
+                                    # descartarla por corta no pierde informacion.
+                                    "redundante": True,
                                 })
                 current_table_lines = []
             in_table = False
@@ -176,7 +198,7 @@ class StructuredChunker:
 
             # Si es atómico (ej. tabla) o suficientemente compacto
             if is_atomic or len(sec_text) <= self.target_chunk_size:
-                if len(sec_text) >= self.min_chunk_size:
+                if self._merece_fragmento(sec_text, redundante=sec.get("redundante", False)):
                     header_prefix = f"[{header_path}]\n" if header_path else ""
                     chunk_text = f"{header_prefix}{sec_text}"
                     chunk_id = f"{filename}_chunk_{chunk_counter}"
@@ -196,7 +218,7 @@ class StructuredChunker:
             # Si la sección es más larga, dividir por oraciones y párrafos
             sub_chunks = self._split_text_with_overlap(sec_text, self.target_chunk_size, self.chunk_overlap)
             for sub_text in sub_chunks:
-                if len(sub_text) >= self.min_chunk_size:
+                if self._merece_fragmento(sub_text, redundante=False):
                     header_prefix = f"[{header_path}]\n" if header_path else ""
                     chunk_text = f"{header_prefix}{sub_text}"
                     chunk_id = f"{filename}_chunk_{chunk_counter}"

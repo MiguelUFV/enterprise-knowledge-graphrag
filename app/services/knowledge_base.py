@@ -9,7 +9,7 @@ from typing import Dict, Any
 from app.core.auth import DEFAULT_TENANT_ID
 from app.core.llm_gateway import get_llm_response
 from app.core.llm_json import parse_llm_json
-from app.core.chunking import structured_chunker
+from app.core.chunking import StructuredChunk, structured_chunker
 from app.core.entity_quality import filter_entities, build_canonicalizer
 from app.db.graph_manager import graph_manager
 from app.db.cache_manager import cache_manager
@@ -74,8 +74,28 @@ async def process_file_content(
     """Indexa el documento en ChromaDB/BM25 y extrae entidades y relaciones hacia Neo4j."""
     logger.info(f"Procesando documento [{tenant_id}]: '{filename}' ({len(content)} caracteres)...")
 
+    # 0. Volver a subir un archivo lo sustituye, no lo superpone. Sin este borrado
+    # quedaban dos restos: los fragmentos que la nueva versión ya no produce seguían
+    # siendo recuperables, y BM25 conservaba el texto antiguo de los que sí (su
+    # add_documents ignora los doc_id que ya conoce, así que la actualización de
+    # ChromaDB no llegaba al índice léxico). Una respuesta podía citar texto borrado.
+    await asyncio.to_thread(hybrid_retriever.delete_document, filename, tenant_id)
+
     # 1. Fragmentación e indexación vectorial + léxica
     structured_chunks = structured_chunker.chunk_document(content, filename)
+
+    # Un documento que el usuario ha subido tiene que poder consultarse. El troceador
+    # descarta fragmentos sin contenido, y una nota de dos líneas puede quedarse en cero:
+    # antes la ingesta devolvía "correcto" sobre un documento que no había indexado nada.
+    if not structured_chunks and content.strip():
+        structured_chunks = [StructuredChunk(
+            chunk_id=f"{filename}_chunk_0",
+            text=content.strip(),
+            filename=filename,
+            chunk_index=0,
+            header_path="",
+            metadata={"is_table": False},
+        )]
     # to_dict() aporta filename, chunk_index, header_path y char_count: sin ellos las
     # respuestas no pueden citar de qué documento y sección proceden.
     chunks_payload = [

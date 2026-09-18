@@ -82,17 +82,26 @@ class GraphManager:
         Las credenciales se leen al instanciar GraphManager (no en cada llamada).
         """
         if not self._driver:
+            driver = None
             try:
-                self._driver = GraphDatabase.driver(
-                    self.uri,
-                    auth=(self.username, self.password)
-                )
-                self._driver.verify_connectivity()
-                logger.info(f"Conexión exitosa a Neo4j en '{self.uri}'")
-                self._ensure_indexes()
+                driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
+                driver.verify_connectivity()
             except Exception as e:
+                # El driver solo se guarda si la conexión se verificó. Guardarlo antes
+                # dejaba uno roto en caché: las llamadas siguientes lo devolvían sin
+                # verificar, dejaban de avisar del fallo y no se recuperaban nunca
+                # aunque Neo4j volviera.
+                if driver is not None:
+                    try:
+                        driver.close()
+                    except Exception:
+                        pass
                 logger.error(f"Fallo al conectar con la base de datos Neo4j: {str(e)}")
                 raise ConnectionError(f"No se pudo conectar a Neo4j en {self.uri}: {str(e)}") from e
+
+            self._driver = driver
+            logger.info(f"Conexión exitosa a Neo4j en '{self.uri}'")
+            self._ensure_indexes()
         return self._driver
 
     def _ensure_indexes(self):

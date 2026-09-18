@@ -21,19 +21,9 @@ def _run(query, **params):
         return s.run(query, **params).data()
 
 
-@pytest.fixture(scope="module", autouse=True)
-def neo4j_or_skip():
-    try:
-        graph_manager.connect()
-    except Exception as e:
-        pytest.skip(f"Neo4j no disponible: {e}")
-    _run(f"MATCH (n:Entity) WHERE n.name STARTS WITH '{PREFIX}' DETACH DELETE n")
-    yield
-    _run(f"MATCH (n:Entity) WHERE n.name STARTS WITH '{PREFIX}' DETACH DELETE n")
-
-
 @pytest.fixture(autouse=True)
-def clean_between_tests():
+def limpiar_nodos_de_prueba(requiere_neo4j):
+    _run(f"MATCH (n:Entity) WHERE n.name STARTS WITH '{PREFIX}' DETACH DELETE n")
     yield
     _run(f"MATCH (n:Entity) WHERE n.name STARTS WITH '{PREFIX}' DETACH DELETE n")
 

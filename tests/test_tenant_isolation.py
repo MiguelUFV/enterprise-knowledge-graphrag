@@ -53,19 +53,8 @@ def test_se_aceptan_identificadores_razonables(entrada):
 
 # --- Grafo ------------------------------------------------------------------
 
-@pytest.fixture(scope="module", autouse=True)
-def neo4j_or_skip():
-    try:
-        graph_manager.connect()
-    except Exception as e:
-        pytest.skip(f"Neo4j no disponible: {e}")
-    _run(f"MATCH (n:Entity) WHERE n.name STARTS WITH '{PREFIX}' DETACH DELETE n")
-    yield
-    _run(f"MATCH (n:Entity) WHERE n.name STARTS WITH '{PREFIX}' DETACH DELETE n")
-
-
 @pytest.fixture
-def dos_empresas():
+def dos_empresas(requiere_neo4j):
     """Ambas tienen una entidad con el MISMO nombre: el caso que más fácil se rompe."""
     comun = {"entity_name": PREFIX + "Cliente Principal", "entity_type": "Organization"}
     graph_manager.upsert_entities_batch([comun], source_doc="a.txt", tenant_id=TENANT_A)

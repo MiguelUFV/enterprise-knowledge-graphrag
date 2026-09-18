@@ -1,5 +1,7 @@
 # Enterprise Knowledge
 
+[![tests](https://github.com/MiguelUFV/enterprise-knowledge-graphrag/actions/workflows/tests.yml/badge.svg)](https://github.com/MiguelUFV/enterprise-knowledge-graphrag/actions/workflows/tests.yml)
+
 Asistente de conocimiento corporativo sobre GraphRAG. Una organización sube su
 documentación y puede preguntar sobre ella en lenguaje natural. Cada respuesta llega
 con las fuentes que la sostienen y con una medida de cuánta evidencia la respalda.
@@ -89,8 +91,8 @@ preguntas que necesitan recorrer relaciones.
 ### Instalación
 
 ```bash
-git clone <url-del-repositorio>
-cd GraphRag
+git clone https://github.com/MiguelUFV/enterprise-knowledge-graphrag.git
+cd enterprise-knowledge-graphrag
 
 python -m venv venv
 venv\Scripts\activate          # en Linux o macOS: source venv/bin/activate

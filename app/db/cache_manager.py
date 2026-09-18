@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import re
 import uuid
 from typing import Optional, Dict, Any, List
 import chromadb
@@ -13,6 +14,23 @@ logger = logging.getLogger(__name__)
 CHROMA_PERSIST_DIR = os.getenv("CHROMADB_PERSIST_DIR", "./chroma_db")
 COLLECTION_NAME = "semantic_cache"
 SIMILARITY_THRESHOLD = 0.92  # Umbral de similitud mínima (0.92)
+
+# Cualquier palabra que contenga una cifra: códigos de contrato (CNT-2021-BCP-001),
+# de incidencia (INC-2026-001), versiones, años, porcentajes, importes.
+_DISCRIMINANTE = re.compile(r"[\w][\w\-./,%:]*\d[\w\-./,%:]*", re.UNICODE)
+
+
+def _identificadores(texto: str) -> frozenset:
+    """
+    Los datos que distinguen una pregunta de otra casi idéntica.
+
+    Dos preguntas que solo se diferencian en un código son casi el mismo vector: la
+    similitud coseno entre "¿presupuesto del proyecto NEXUS-RESEARCH-001?" y la misma
+    con -009 supera el 0.92 con holgura. Sin esta comprobación la caché respondía a la
+    segunda con la respuesta de la primera, y encima la etiquetaba como evidencia
+    suficiente: la invención exacta que el resto del sistema existe para evitar.
+    """
+    return frozenset(m.group(0).lower().strip(".,;:") for m in _DISCRIMINANTE.finditer(texto or ""))
 
 
 class CacheManager:
@@ -66,6 +84,18 @@ class CacheManager:
 
             if similarity >= threshold:
                 metadata = results["metadatas"][0][0]
+
+                # La similitud no basta: tiene que preguntar por lo mismo, no por algo
+                # que se le parece. Si los códigos o las cifras no coinciden, es un fallo
+                # de caché aunque los vectores estén pegados.
+                guardada = metadata.get("original_query", "")
+                if _identificadores(query) != _identificadores(guardada):
+                    logger.info(
+                        "Caché descartada pese a la similitud: los identificadores no coinciden "
+                        f"({sorted(_identificadores(query))} vs {sorted(_identificadores(guardada))})."
+                    )
+                    return None
+
                 sources = json.loads(metadata.get("sources", "[]"))
                 return {
                     "text": metadata.get("response_text", ""),
